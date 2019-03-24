@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-// import orbit from 'three-orbit-controls';
-// const OrbitControls = orbit(THREE);
+import orbit from 'three-orbit-controls';
+const OrbitControls = orbit(THREE);
 import TrackballControls from 'three-trackballcontrols';
+import Wall from './models/Wall';
 
 export default class App {
   constructor() {
@@ -15,11 +16,10 @@ export default class App {
     //   Near plane at z=0.5, far plane at z=500
     this.camera = new THREE.PerspectiveCamera(75, 4/3, 0.5, 500);
     // Place the camera at (0,0,100)
-    this.camera.position.z = 100;
+    this.camera.position.z = -120;
+    this.camera.position.y = 40;
+    //this.camera.position.x = -100;
 
-    // const orbiter = new OrbitControls(this.camera);
-    // orbiter.enableZoom = false;
-    // orbiter.update();
     this.tracker = new TrackballControls(this.camera);
     this.tracker.rotateSpeed = 2.0;
     // Allow zoom and pan
@@ -27,11 +27,33 @@ export default class App {
     this.tracker.noPan = false;
 
     // Dodecahedron radius = 30
-    const dodecgeom = new THREE.DodecahedronGeometry(30);
-    const dodecmatr = new THREE.MeshBasicMaterial({color: 0x14ae6e});
-    const dodecmesh = new THREE.Mesh(dodecgeom, dodecmatr);
-    this.scene.add(dodecmesh);
+    //const dodecgeom = new THREE.DodecahedronGeometry(30);
+    //const dodecmatr = new THREE.MeshPhongMaterial ({color: 0x00FFae});
+    //const dodecmesh = new THREE.Mesh(dodecgeom, dodecmatr);
+    //this.scene.add(dodecmesh);
 
+    // Add our Plane
+    var geometry = new THREE.BoxGeometry( 400, 5, 200);
+    var material = new THREE.MeshBasicMaterial( {color: 0xFFaaFF} );
+    var cube = new THREE.Mesh( geometry, material );  
+    this.scene.add( cube );
+
+    //Add our wall(s)
+    for (var i = 0; i < 15; i++){
+      var newWall = new Wall(20,20,5);
+      var ypos = Math.floor((Math.random() * 100) - 100); 
+      var xpos = ((Math.random() * 400) - 200); 
+      var move = new THREE.Vector3(xpos, 10, -ypos);
+      newWall.position.copy( move );
+      newWall.matrixAutoUpdate = false;
+      newWall.updateMatrix();
+      this.scene.add( newWall );
+    }
+	
+	  const lightOne = new THREE.DirectionalLight (0xFFFFFF, 1.0);
+	  lightOne.position.set (10, 40, 100);
+	  this.scene.add (lightOne);
+	
     window.addEventListener('resize', () => this.resizeHandler());
     this.resizeHandler();
     requestAnimationFrame(() => this.render());
