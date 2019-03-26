@@ -32,24 +32,39 @@ export default class App {
     //const dodecmesh = new THREE.Mesh(dodecgeom, dodecmatr);
     //this.scene.add(dodecmesh);
 
+    // Add background
+    /*
+    var loader = new THREE.TextureLoader();
+    loader.load('../app/js/space.jpg', function( space ){
+      var backGeo = new THREE.BoxGeometry( 600, 200, 5);
+      var backMat = new THREE.MeshBasicMaterial( {map: space} );
+      var background = new THREE.Mesh( backGeo, backMat );
+      var moveBack = new THREE.Vector3(0, 75, 150);
+      background.position.copy( moveBack );
+      this.scene.add(background);
+    }); */
+    
+    var backGeo = new THREE.BoxGeometry( 600, 200, 5);
+    var backMat = new THREE.MeshBasicMaterial( {color: 0x0000FF } );
+    var background = new THREE.Mesh( backGeo, backMat );
+    var moveBack = new THREE.Vector3(0, 75, 150);
+    background.position.copy( moveBack );
+    this.scene.add(background);
+    
     // Add our Plane
-    var geometry = new THREE.BoxGeometry( 400, 5, 200);
-    var material = new THREE.MeshBasicMaterial( {color: 0xFFaaFF} );
+    var geometry = new THREE.BoxGeometry( 400, 5, 400);
+    var material = new THREE.MeshBasicMaterial( {color: 0xd3d3d3} );
     var cube = new THREE.Mesh( geometry, material );  
     this.scene.add( cube );
 
     //Add our wall(s)
-    for (var i = 0; i < 15; i++){
-      var newWall = new Wall(20,20,5);
-      var ypos = Math.floor((Math.random() * 100) - 100); 
-      var xpos = ((Math.random() * 400) - 200); 
-      var move = new THREE.Vector3(xpos, 10, -ypos);
-      newWall.position.copy( move );
-      newWall.matrixAutoUpdate = false;
-      newWall.updateMatrix();
-      this.scene.add( newWall );
-    }
-	
+    this.wallArray = [];
+    this.allWalls = [];
+    this.count = 0;
+    this.makeWalls();
+    this.transX = new THREE.Matrix4().makeTranslation(0, 0, -1);
+  
+    // Add our light
 	  const lightOne = new THREE.DirectionalLight (0xFFFFFF, 1.0);
 	  lightOne.position.set (10, 40, 100);
 	  this.scene.add (lightOne);
@@ -60,6 +75,17 @@ export default class App {
   }
 
   render() {
+    this.count += 1;
+    for (var i = 0; i < 15; i++){
+      this.wallArray[i].matrix.multiply(this.transX);
+    }
+    if (this.count%350 == 0){
+        this.removeWalls();
+        this.makeWalls();
+    }
+    if(this.count%50 == 0){
+      //this.makeWalls();
+    }
     this.renderer.render(this.scene, this.camera);
     this.tracker.update();
     // setup the render function to "autoloop"
@@ -80,4 +106,34 @@ export default class App {
     this.renderer.setSize(w, h);
     this.tracker.handleResize();
   }
+
+  makeWalls(){
+    for (var i = 0; i < 15; i++){
+      this.newWall = new Wall(20,20,5,this.count);
+      this.ypos = Math.floor((Math.random() * 100) - 200); 
+      this.xpos = ((Math.random() * 400) - 200); 
+      this.move = new THREE.Vector3(this.xpos, 10, -this.ypos);
+      this.newWall.position.copy( this.move );
+      this.newWall.matrixAutoUpdate = false;
+      this.newWall.updateMatrix();
+      this.wallArray[i] = this.newWall;
+      //this.scene.add( this.newWall );
+    }
+    this.allWalls.push(this.wallArray);
+    console.log(this.allWalls);
+    for (var x = 0; x < this.wallArray.length; x++){
+      for (var y = 0; y < this.allWalls.length; y++){
+          this.scene.add( this.allWalls[y][x]);
+      }
+    }
+  }
+
+  removeWalls(){
+    for (var x = 0; x < this.wallArray.length; x++){
+      for (var y = 0; y < this.allWalls.length; y++){
+          this.scene.remove( this.allWalls[y][x]);
+      }
+    }
+  }
+
 }
