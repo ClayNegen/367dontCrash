@@ -16,7 +16,7 @@ export default class App {
     //   Near plane at z=0.5, far plane at z=500
     this.camera = new THREE.PerspectiveCamera(75, 4/3, 0.5, 500);
     // Place the camera at (0,0,100)
-    this.camera.position.z = -120;
+    this.camera.position.z = -200;
     this.camera.position.y = 40;
     //this.camera.position.x = -100;
 
@@ -29,7 +29,7 @@ export default class App {
     // Add background
     this.texture = new THREE.TextureLoader().load( 'space.jpg' );
     
-    var backGeo = new THREE.BoxGeometry( 600, 200, 5);
+    var backGeo = new THREE.BoxGeometry( 800, 400, 5);
     var backMat = new THREE.MeshBasicMaterial( {map: this.texture } );
     var background = new THREE.Mesh( backGeo, backMat );
     var moveBack = new THREE.Vector3(0, 75, 150);
@@ -39,11 +39,19 @@ export default class App {
     // Add our Plane
     this.texture2 = new THREE.TextureLoader().load( 'floor.jpg' );
 
-    var geometry = new THREE.BoxGeometry( 400, 5, 400);
-    var material = new THREE.MeshBasicMaterial( {color: 0xd3d3d3} );
+    var geometry = new THREE.BoxGeometry( 650, 5, 400);
+    var material = new THREE.MeshPhongMaterial( {color: 0xd3d3d3} );
     //var material = new THREE.MeshBasicMaterial( {map: this.texture2} );
     var plane = new THREE.Mesh( geometry, material );  
     this.scene.add( plane );
+
+    // Add our Player
+    var playerGeo = new THREE.BoxGeometry( 8, 10, 5);
+    var playerMat = new THREE.MeshBasicMaterial( {color: 0x0000FF} );
+    var player = new THREE.Mesh( playerGeo, playerMat );
+    var placePlayer = new THREE.Vector3(0, 5, -150);
+    player.position.copy( placePlayer );
+    this.scene.add(player);
 
     // Add our wall(s)
     this.wallArray = [];
@@ -53,7 +61,7 @@ export default class App {
       this.makeWalls();
     }
     // Wall Movement Matrix
-    this.transX = new THREE.Matrix4().makeTranslation(0, 0, -1);
+    this.transX = new THREE.Matrix4().makeTranslation(0, 0, -2);
   
     // Add our light
 	  const lightOne = new THREE.DirectionalLight (0xFFFFFF, 1.0);
@@ -67,17 +75,21 @@ export default class App {
     
     var stopBtn = document.getElementById("stop");
     stopBtn.addEventListener('click', () => this.stopRender());
-	
+
+    //window.addEventListener('keydown', (e) => this.moveLeft(e));
+    
+    this.score = 0;
     window.addEventListener('resize', () => this.resizeHandler());
     this.resizeHandler();
     this.startRender();
-    requestAnimationFrame(() => this.render());
+    //requestAnimationFrame(() => this.render());
   }
 
   render() {
     this.count += 1;
-    window.addEventListener('keydown', () => this.moveLeft());
+    window.addEventListener('keydown', (e) => this.moveLeft(e));
 
+    //Move and Remove Walls
     for (var i = 0; i < this.wallArray.length; i++){
       this.wallArray[i].matrix.multiply(this.transX);
       if(this.wallArray[i].matrix.elements[14] == -200){
@@ -85,7 +97,8 @@ export default class App {
       }
     }
 
-    if(this.count%75 == 0){
+    // Make new Walls ever 75 renders
+    if(this.count%65 == 0){
       for (var i = 0; i < 5; i++){
         this.makeWalls();
       }
@@ -93,6 +106,11 @@ export default class App {
     
     this.renderer.render(this.scene, this.camera);
     this.tracker.update();
+    // Update Score
+    if(this.count%10 == 0){
+      this.score+=1;
+      document.getElementById("finalScore").innerHTML = this.score;
+    }
     // setup the render function to "autoloop"
     if (this.renderBool == true){
       requestAnimationFrame(() => this.render());
@@ -130,36 +148,36 @@ export default class App {
     this.scene.remove(endWall);  
   }
 
-  moveLeft(){
-    var left = new THREE.Matrix4().makeTranslation(0.01, 0, 0);
-    for (var i = 0; i < this.wallArray.length; i++){
-      this.wallArray[i].matrix.multiply( left );
-    }
-    /*
+  moveLeft(e){
     switch (e.keyCode) {
       case 37:
-          alert('left');
+          var right = new THREE.Matrix4().makeTranslation(-0.01, 0, 0);
+          for (var i = 0; i < this.wallArray.length; i++){
+            this.wallArray[i].matrix.multiply( right );
+          }
           break;
       case 38:
-          alert('up');
           break;
       case 39:
-          alert('right');
+          var left = new THREE.Matrix4().makeTranslation(0.01, 0, 0);
+          for (var i = 0; i < this.wallArray.length; i++){
+            this.wallArray[i].matrix.multiply( left );
+          }
           break;
       case 40:
-          alert('down');
           break;
     }
-    */
   }
 
   stopRender(){
     this.renderBool = false;
     console.log(this.renderBool);
+    console.log(this.wallArray.length);
   }
   
   startRender(){
     this.renderBool = true;
+    requestAnimationFrame(() => this.render());
     console.log(this.renderBool);
   }
 
