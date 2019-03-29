@@ -76,7 +76,7 @@ export default class App {
     var stopBtn = document.getElementById("stop");
     stopBtn.addEventListener('click', () => this.stopRender());
 
-    //window.addEventListener('keydown', (e) => this.moveLeft(e));
+    window.addEventListener('keydown', (e) => this.moveLeft(e));
     
     this.score = 0;
     window.addEventListener('resize', () => this.resizeHandler());
@@ -84,10 +84,10 @@ export default class App {
     this.startRender();
     //requestAnimationFrame(() => this.render());
   }
-
+  
   render() {
     this.count += 1;
-    window.addEventListener('keydown', (e) => this.moveLeft(e));
+    //window.addEventListener('keydown', (e) => this.moveLeft(e));
 
     //Move and Remove Walls
     for (var i = 0; i < this.wallArray.length; i++){
@@ -151,7 +151,7 @@ export default class App {
   moveLeft(e){
     switch (e.keyCode) {
       case 37:
-          var right = new THREE.Matrix4().makeTranslation(-0.01, 0, 0);
+          var right = new THREE.Matrix4().makeTranslation(-2, 0, 0);
           for (var i = 0; i < this.wallArray.length; i++){
             this.wallArray[i].matrix.multiply( right );
           }
@@ -159,7 +159,7 @@ export default class App {
       case 38:
           break;
       case 39:
-          var left = new THREE.Matrix4().makeTranslation(0.01, 0, 0);
+          var left = new THREE.Matrix4().makeTranslation(2, 0, 0);
           for (var i = 0; i < this.wallArray.length; i++){
             this.wallArray[i].matrix.multiply( left );
           }
