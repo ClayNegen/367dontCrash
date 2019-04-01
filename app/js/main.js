@@ -3,6 +3,8 @@ import orbit from 'three-orbit-controls';
 const OrbitControls = orbit(THREE);
 import TrackballControls from 'three-trackballcontrols';
 import Wall from './models/Wall';
+import EndScreen from './models/EndScreen';
+import { RGBA_ASTC_10x10_Format } from 'three';
 
 export default class App {
   constructor() {
@@ -57,9 +59,10 @@ export default class App {
     this.wallArray = [];
     this.allWalls = [];
     this.count = 0;
-    for (var i = 0; i < 5; i++){
+    for (var i = 0; i < 7; i++){
       this.makeWalls();
     }
+
     // Wall Movement Matrix
     this.transX = new THREE.Matrix4().makeTranslation(0, 0, -2);
   
@@ -72,34 +75,34 @@ export default class App {
     this.rederBool = true;
     var startBtn = document.getElementById("start");
     startBtn.addEventListener('click', () => this.startRender());
-    
     var stopBtn = document.getElementById("stop");
     stopBtn.addEventListener('click', () => this.stopRender());
-
     window.addEventListener('keydown', (e) => this.moveLeft(e));
-    
-    this.score = 0;
-    window.addEventListener('resize', () => this.resizeHandler());
+    //window.addEventListener('resize', () => this.resizeHandler());
     this.resizeHandler();
+    
+    // Global Variables and start render
+    this.score = 0;
+    this.hit = 0;
     this.startRender();
-    //requestAnimationFrame(() => this.render());
   }
   
   render() {
     this.count += 1;
-    //window.addEventListener('keydown', (e) => this.moveLeft(e));
 
-    //Move and Remove Walls
+    // Move and Remove Walls
+    // Detect collisions
     for (var i = 0; i < this.wallArray.length; i++){
       this.wallArray[i].matrix.multiply(this.transX);
+      this.detectCollision(this.wallArray[i]);
       if(this.wallArray[i].matrix.elements[14] == -200){
         this.removeWalls(this.wallArray[i]);
       }
     }
 
     // Make new Walls ever 75 renders
-    if(this.count%65 == 0){
-      for (var i = 0; i < 5; i++){
+    if(this.count%25 == 0){
+      for (var i = 0; i < 4; i++){
         this.makeWalls();
       }
     }
@@ -151,22 +154,44 @@ export default class App {
   moveLeft(e){
     switch (e.keyCode) {
       case 37:
-          var right = new THREE.Matrix4().makeTranslation(-2, 0, 0);
+          var right = new THREE.Matrix4().makeTranslation(-5, 0, 0);
           for (var i = 0; i < this.wallArray.length; i++){
+            //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (0.15/this.wallArray.length));
             this.wallArray[i].matrix.multiply( right );
           }
           break;
       case 38:
           break;
       case 39:
-          var left = new THREE.Matrix4().makeTranslation(2, 0, 0);
+          var left = new THREE.Matrix4().makeTranslation(5, 0, 0);
           for (var i = 0; i < this.wallArray.length; i++){
+            //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), -(0.15/this.wallArray.length));
             this.wallArray[i].matrix.multiply( left );
           }
           break;
       case 40:
           break;
     }
+  }
+
+  detectCollision(enemy){
+    if (-148 > enemy.matrix.elements[14] && enemy.matrix.elements[14] > -152){
+      if(-15 < enemy.matrix.elements[12] && enemy.matrix.elements[12] < 15){
+        //this.endGame();
+        this.hit+=1;
+        document.getElementById("hits").innerHTML = this.hit;
+        //this.stopRender();
+      }
+    }
+  }
+
+  endGame(){
+    this.screen = new EndScreen();
+    var place = new THREE.Vector3(0, 25, -200);
+    this.screen.position.copy( place );
+    //this.screen.rotateOnAxis([0,0,1], 90);
+    this.scene.add(this.screen);
+    this.camera.position.z = -280;
   }
 
   stopRender(){

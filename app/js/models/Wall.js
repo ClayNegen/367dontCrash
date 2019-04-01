@@ -2,7 +2,7 @@ import { BoxGeometry } from 'three';
 import * as THREE from 'three';
 import { Group } from '../../../node_modules/three/src/objects/Group';
 
-export default class Wheel extends Group {
+export default class Wall extends Group {
   constructor (width, height, depth, time) { // number of spokes on the wheel
     super();    // invoke the super class constructor
 

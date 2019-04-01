@@ -4,6 +4,7 @@
   <title>
 	Dont Crash!
   </title>
+  <link rel="stylesheet" href="assets/css/main.css" />
 </head>
 <style>
   html {
@@ -19,7 +20,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background: lemonchiffon;
+    background: black;
   }
   canvas {
     width: 75%;
@@ -28,11 +29,13 @@
 </style>
 
 <body>
-  <h1>Don't Crash!</h1>
+  <p></p>
+  <header id="header">
+    <h1>Don't Crash!</h1>
+  </header>
   <h2> 
-    <table class="widthOneHundredPercent">
-      <p>Your Score: <span id="finalScore"></span></p>
-    </table> 
+    Your Score: <span id="finalScore"></span>
+    Hits: <span id="hits"></span>
   </h2>
     Left Arrow Key to move left | Right Arrow Key to move right
     <div id="container">
