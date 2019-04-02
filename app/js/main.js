@@ -53,7 +53,7 @@ export default class App {
     var placePlayer = new THREE.Vector3(0, 15, -150);
     this.player.position.copy( placePlayer );
     this.player.rotateOnAxis(new THREE.Vector3(0, 1, 0), (3.14));
-    this.player.scale(0.7, 0.7, 0);
+    //this.player.scale(0.7, 0.7);
     this.scene.add(this.player);
 
     // Add our wall(s)
