@@ -25,7 +25,8 @@ export default class Screen extends Group {
     texture.needsUpdate = true;
 
     var geometry = new THREE.BoxGeometry( 200, 200, 0 );
-    var material = new THREE.MeshBasicMaterial( {map: texture} ); //add randomizer for color
+    //var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var material = new THREE.MeshBasicMaterial( {color: 0xFFFFFF} );
     var screen = new THREE.Mesh( geometry, material );
     this.add( screen );   
     }

@@ -4,6 +4,7 @@ const OrbitControls = orbit(THREE);
 import TrackballControls from 'three-trackballcontrols';
 import Wall from './models/Wall';
 import EndScreen from './models/EndScreen';
+import Ship from './models/Ship';
 import { RGBA_ASTC_10x10_Format } from 'three';
 
 export default class App {
@@ -48,12 +49,12 @@ export default class App {
     this.scene.add( plane );
 
     // Add our Player
-    var playerGeo = new THREE.BoxGeometry( 8, 10, 5);
-    var playerMat = new THREE.MeshBasicMaterial( {color: 0x0000FF} );
-    var player = new THREE.Mesh( playerGeo, playerMat );
-    var placePlayer = new THREE.Vector3(0, 5, -150);
-    player.position.copy( placePlayer );
-    this.scene.add(player);
+    this.player = new Ship();
+    var placePlayer = new THREE.Vector3(0, 15, -150);
+    this.player.position.copy( placePlayer );
+    this.player.rotateOnAxis(new THREE.Vector3(0, 1, 0), (3.14));
+    this.player.scale(0.7, 0.7, 0);
+    this.scene.add(this.player);
 
     // Add our wall(s)
     this.wallArray = [];
@@ -157,6 +158,15 @@ export default class App {
 
   moveLeft(e){
     switch (e.keyCode) {
+      case 32:
+          //spacebar
+          if (this.rederBool == true){ 
+            this.stopRender();
+          }
+          else if(this.renderBool == false){
+            this.startRender();
+          }
+          break;
       case 37:
           var right = new THREE.Matrix4().makeTranslation(-5, 0, 0);
           //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (0.01));
@@ -175,6 +185,9 @@ export default class App {
           break;
       case 40:
           break;
+      case 82:
+          //R
+          this.reset();
     }
   }
 
@@ -218,6 +231,7 @@ export default class App {
     this.score = 0;
     this.hit = 0;
     document.getElementById("hits").innerHTML = this.hit;
+    document.getElementById("finalScore").innerHTML = this.score;
     this.wallArray = [];
     this.stopRender();
     this.startRender();
