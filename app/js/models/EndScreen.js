@@ -1,34 +1,32 @@
 import { BoxGeometry } from 'three';
 import * as THREE from 'three';
 import { Group } from '../../../node_modules/three/src/objects/Group';
-//import this.score from '../main.js';
 
 export default class Screen extends Group {
   constructor () { // number of spokes on the wheel
     super();    // invoke the super class constructor
 
-    //Text code got from: 
-    //https://stackoverflow.com/questions/12380072/threejs-render-text-in-canvas-as-texture-and-then-apply-to-a-plane
-    var bitmap = document.createElement('canvas');
-    var g = bitmap.getContext('2d');
-    bitmap.width = 64;
-    bitmap.height = 64;
-    g.font = 'Bold 30px Arial';
-    var text = "Score: "+ this.score;
-    g.fillStyle = 'white';
-    g.fillText(text, 0, 20);
-    g.strokeStyle = 'black';
-    g.strokeText(text, 0, 20);
+    var texture = new THREE.TextureLoader().load( 'BandW.jpg' );
+    var flagGeo = new THREE.BoxGeometry( 200, 30, 0 );
+    var flagMat = new THREE.MeshBasicMaterial( {map: texture} );
+    var flag = new THREE.Mesh( flagGeo, flagMat ); 
+    var move = new THREE.Vector3(0, 60, 0); //horizontal, verticle, depth
+    flag.position.copy( move );  
+    this.add( flag );
 
-    // canvas contents will be used for a texture
-    var texture = new THREE.Texture(bitmap); 
-    texture.needsUpdate = true;
+    var lpoleGeo = new THREE.CylinderGeometry(3, 3, 85);
+    var lpoleMat = new THREE.MeshPhongMaterial( {color: 0xFFFFFF} );
+    var lpole = new THREE.Mesh( lpoleGeo, lpoleMat );
+    var movePole = new THREE.Vector3(-100, 30, 0); //horizontal, verticle, depth
+    lpole.position.copy( movePole );
+    this.add(lpole)
 
-    var geometry = new THREE.BoxGeometry( 200, 200, 0 );
-    //var material = new THREE.MeshBasicMaterial( {map: texture} );
-    var material = new THREE.MeshBasicMaterial( {color: 0xFFFFFF} );
-    var screen = new THREE.Mesh( geometry, material );
-    this.add( screen );   
+    var rpoleGeo = new THREE.CylinderGeometry(3, 3, 85);
+    var rpoleMat = new THREE.MeshPhongMaterial( {color: 0xFFFFFF} );
+    var rpole = new THREE.Mesh( rpoleGeo, rpoleMat );
+    var moveRPole = new THREE.Vector3(100, 30, 0); //horizontal, verticle, depth
+    rpole.position.copy( moveRPole );
+    this.add(rpole)
     }
 
 }

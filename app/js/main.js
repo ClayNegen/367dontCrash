@@ -5,7 +5,7 @@ import TrackballControls from 'three-trackballcontrols';
 import Wall from './models/Wall';
 import EndScreen from './models/EndScreen';
 import Ship from './models/Ship';
-import { RGBA_ASTC_10x10_Format } from 'three';
+
 
 export default class App {
   constructor() {
@@ -26,12 +26,11 @@ export default class App {
     this.tracker = new TrackballControls(this.camera);
     this.tracker.rotateSpeed = 2.0;
     // Allow zoom and pan
-    this.tracker.noZoom = false;
-    this.tracker.noPan = false;
+    this.tracker.noZoom = true;
+    this.tracker.noPan = true;
 
     // Add background
     this.texture = new THREE.TextureLoader().load( 'space.jpg' );
-    
     var backGeo = new THREE.BoxGeometry( 800, 400, 5);
     var backMat = new THREE.MeshBasicMaterial( {map: this.texture } );
     var background = new THREE.Mesh( backGeo, backMat );
@@ -53,7 +52,9 @@ export default class App {
     var placePlayer = new THREE.Vector3(0, 15, -150);
     this.player.position.copy( placePlayer );
     this.player.rotateOnAxis(new THREE.Vector3(0, 1, 0), (3.14));
-    //this.player.scale(0.7, 0.7);
+    this.player.scale.x = 0.5;
+    this.player.scale.y = 0.5;
+    this.player.scale.z = 0.5;
     this.scene.add(this.player);
 
     // Add our wall(s)
@@ -76,13 +77,29 @@ export default class App {
     stopBtn.addEventListener('click', () => this.stopRender());
     var resetBtn = document.getElementById("reset");
     resetBtn.addEventListener('click', () => this.reset());
-    window.addEventListener('keydown', (e) => this.moveLeft(e));
+    window.addEventListener('keydown', (e) => this.keyPress(e));
+    
+    /*
+    this.keyState = {};
+    window.addEventListener('keydown', 
+    function(e){
+      this.keyState[e.keyCode] = true;
+    },
+    true);
+    window.addEventListener('keyup',function(e){
+      console.log(e.keyCode);
+      this.keyState[e.keyCode] = false;
+    },true);
+  */
+
     window.addEventListener('resize', () => this.resizeHandler());
     this.resizeHandler();
     
     // Global Variables and start render
+    this.screen;
     this.score = 0;
     this.hit = 0;
+    this.up = false;
     this.startRender();
   }
   
@@ -98,12 +115,32 @@ export default class App {
         this.removeWalls(this.wallArray[i]);
       }
     }
+    /*
+    if (this.keyState[37]){
+      this.moveRight();
+    }
+    if (this.keyState[39]){
+      this.moveLeft();
+    }
+    */
 
     // Make new Walls every 25 renders
-    if(this.count%25 == 0){
-      for (var i = 0; i < 4; i++){
-        this.makeWalls();
+    if(this.count < 2400){
+      if(this.count%25 == 0){
+        for (var i = 0; i < 4; i++){
+          this.makeWalls();
+        }
       }
+    }
+    else if (this.count == 2500){
+      this.final();
+    }
+    else if(this.count > 2500){
+      this.moveFinal(this.gate);
+    }
+
+    if(this.count == 2750){
+      //END THE GAME
     }
     
     this.renderer.render(this.scene, this.camera);
@@ -155,11 +192,11 @@ export default class App {
     this.transX = new THREE.Matrix4().makeTranslation(0, 0, -2 - (this.count/1000));
     wall.matrix.multiply(this.transX);
   }
-
-  moveLeft(e){
+  
+  keyPress(e){
     switch (e.keyCode) {
       case 32:
-          //spacebar
+          //spacebar = pause
           if (this.rederBool == true){ 
             this.stopRender();
           }
@@ -168,29 +205,22 @@ export default class App {
           }
           break;
       case 37:
-          var right = new THREE.Matrix4().makeTranslation(-5, 0, 0);
-          //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (0.01));
-          for (var i = 0; i < this.wallArray.length; i++){
-            this.wallArray[i].matrix.multiply( right );
-          }
+          this.moveRight();
           break;
       case 38:
           break;
       case 39:
-          var left = new THREE.Matrix4().makeTranslation(5, 0, 0);
-          //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), -(0.15));
-          for (var i = 0; i < this.wallArray.length; i++){
-            this.wallArray[i].matrix.multiply( left );
-          }
+          this.moveLeft();
           break;
       case 40:
           break;
       case 82:
           //R
           this.reset();
+          break;
     }
   }
-
+  
   detectCollision(enemy){
     if (-148 > enemy.matrix.elements[14] && enemy.matrix.elements[14] > -152){
       if(-15 < enemy.matrix.elements[12] && enemy.matrix.elements[12] < 15){
@@ -202,13 +232,19 @@ export default class App {
     }
   }
 
-  endGame(){
-    this.screen = new EndScreen();
-    var place = new THREE.Vector3(0, 25, -200);
-    this.screen.position.copy( place );
-    //this.screen.rotateOnAxis([0,0,1], 90);
-    this.scene.add(this.screen);
-    this.camera.position.z = -280;
+  final(){
+    this.gate = new EndScreen();
+    var move = new THREE.Vector3(0, 10, 200);
+    this.gate.position.copy( move );
+    this.gate.matrixAutoUpdate = false;
+    this.gate.updateMatrix();
+    this.scene.add(this.gate);
+    console.log('its here');
+  }
+  
+  moveFinal(gate){
+    var gateMove = new THREE.Matrix4().makeTranslation(0, 0, -1.5);
+    gate.matrix.multiply( gateMove );
   }
 
   stopRender(){
@@ -238,4 +274,24 @@ export default class App {
     this.stopRender();
   }
 
+  moveLeft(){
+    var left = new THREE.Matrix4().makeTranslation(5, 0, 0);
+    //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), -(0.15));
+    for (var i = 0; i < this.wallArray.length; i++){
+      this.wallArray[i].matrix.multiply( left );
+    }
+  }
+
+  moveRight(){
+    var right = new THREE.Matrix4().makeTranslation(-5, 0, 0);
+    //this.camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (0.01));
+    for (var i = 0; i < this.wallArray.length; i++){
+      this.wallArray[i].matrix.multiply( right );
+    }
+  }
+
+  keyUpHandler(){
+    this.up = true;
+    console.log(this.up);
+  }
 }
