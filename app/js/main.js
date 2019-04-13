@@ -78,20 +78,7 @@ export default class App {
     var resetBtn = document.getElementById("reset");
     resetBtn.addEventListener('click', () => this.reset());
     window.addEventListener('keydown', (e) => this.keyPress(e));
-    
-    /*
-    this.keyState = {};
-    window.addEventListener('keydown', 
-    function(e){
-      this.keyState[e.keyCode] = true;
-    },
-    true);
-    window.addEventListener('keyup',function(e){
-      console.log(e.keyCode);
-      this.keyState[e.keyCode] = false;
-    },true);
-  */
-
+    //window.addEventListener('keyup', (e) => this.function(e));
     window.addEventListener('resize', () => this.resizeHandler());
     this.resizeHandler();
     
@@ -100,6 +87,7 @@ export default class App {
     this.score = 0;
     this.hit = 0;
     this.up = false;
+    this.highScore = 0;
     this.startRender();
   }
   
@@ -115,17 +103,9 @@ export default class App {
         this.removeWalls(this.wallArray[i]);
       }
     }
-    /*
-    if (this.keyState[37]){
-      this.moveRight();
-    }
-    if (this.keyState[39]){
-      this.moveLeft();
-    }
-    */
 
     // Make new Walls every 25 renders
-    if(this.count < 2400){
+    if(this.count < 2450){
       if(this.count%25 == 0){
         for (var i = 0; i < 4; i++){
           this.makeWalls();
@@ -140,7 +120,9 @@ export default class App {
     }
 
     if(this.count == 2750){
-      //END THE GAME
+      document.getElementById("hits").innerHTML = 275;
+      document.getElementById("end").innerHTML = "You Won";
+      this.stopRender();
     }
     
     this.renderer.render(this.scene, this.camera);
@@ -166,6 +148,12 @@ export default class App {
     }
     canvas.width = w;
     canvas.height = h;
+    h = 420;
+    w = h * 4/ 3;
+
+    document.getElementById("wrap").top = window.innerHeight/2;
+    document.getElementById("wrap").left = window.innerHeight/2;
+
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
     this.tracker.handleResize();
@@ -226,8 +214,11 @@ export default class App {
       if(-15 < enemy.matrix.elements[12] && enemy.matrix.elements[12] < 15){
         //this.endGame();
         this.hit+=1;
-        document.getElementById("hits").innerHTML = this.hit;
-        //this.stopRender();
+        if (this.score > this.highScore){
+          document.getElementById("hits").innerHTML = this.score;
+          document.getElementById("end").innerHTML = "You Lost";
+        }
+        this.stopRender();
       }
     }
   }
@@ -266,8 +257,8 @@ export default class App {
     this.count = 0;
     this.score = 0;
     this.hit = 0;
-    document.getElementById("hits").innerHTML = this.hit;
     document.getElementById("finalScore").innerHTML = this.score;
+    document.getElementById("end").innerHTML = "";
     this.wallArray = [];
     this.stopRender();
     this.startRender();

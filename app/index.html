@@ -11,13 +11,13 @@
     height: 100%;
   }
   body {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     right: 0;
   }
   #container {
-    display: flex;
+    display:flex; 
     flex-direction: row;
     justify-content: center;
     background: black;
@@ -26,22 +26,29 @@
     width: 75%;
     height: 75%;
   }
+  .wrapper{
+    position: absolute;
+    top: 250px;
+    left: 650px;
+    color: white;
+    font-size: 20px;
+    margin : 20px;
+  }
 </style>
 
 <body>
-  <p><li></li></p>
-  <p></p>
-  <p></p>
-  <p></p>
   <header id="header">
     <h1>Cube Space</h1>
   </header>
   <h2> 
     Your Score: <span id="finalScore"></span>
-    Hits: <span id="hits"></span>
+    High Score: <span id="hits"></span>
   </h2>
   <div id="container">
     <canvas id="mycanvas"></canvas>
+  </div>
+  <div class="wrapper" id="wrap">
+    <h1><span id="end"></span></h1>
   </div>
     <li>Left Arrow Key to move left | Right Arrow Key to move right</li>
     <li> Spacebar to pause | R to reset</li>
