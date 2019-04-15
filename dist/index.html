@@ -28,8 +28,8 @@
   }
   .wrapper{
     position: absolute;
-    padding-top: 250px;
-    padding-left: 650px;
+    top: 250px;
+    left: 650px;
     color: white;
     font-size: 20px;
     margin : 20px;
@@ -37,26 +37,24 @@
 </style>
 
 <body>
-  <p></p><br>
   <header id="header">
     <h1>Cube Space</h1>
   </header>
   <h2> 
     Your Score: <span id="finalScore"></span>
     High Score: <span id="hits"></span>
-    <span style="margin:auto; display:table;" id="end"></span>
   </h2>
   <div id="container">
     <canvas id="mycanvas"></canvas>
   </div>
-  <p align = "center" >Reach a score of 275 to win!</p>
+  <div class="wrapper" id="wrap">
+    <h1><span id="end"></span></h1>
+  </div>
+    <li>Left Arrow Key to move left | Right Arrow Key to move right</li>
+    <li> Spacebar to pause | R to reset</li>
   <button id="start">Start</button>
   <button id="stop">Stop</button>
   <button id="reset">Restart</button>
-  <li>Left Arrow Key to move left</li>
-  <li>Right Arrow Key to move right</li>
-  <li>R to reset</li>
-  <li>Spacebar to pause </li>
-</body>
+<script type="text/javascript" src="bundle.js"></script></body>
 
 </html>

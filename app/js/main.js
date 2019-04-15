@@ -151,8 +151,9 @@ export default class App {
     h = 420;
     w = h * 4/ 3;
 
-    document.getElementById("wrap").top = window.innerHeight/2;
-    document.getElementById("wrap").left = window.innerHeight/2;
+    //const wrap = document.getElementById("wrap");
+    //wrap.left = "0px";
+    //wrap.top = w/2;
 
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
@@ -212,11 +213,13 @@ export default class App {
   detectCollision(enemy){
     if (-148 > enemy.matrix.elements[14] && enemy.matrix.elements[14] > -152){
       if(-15 < enemy.matrix.elements[12] && enemy.matrix.elements[12] < 15){
-        //this.endGame();
-        this.hit+=1;
         if (this.score > this.highScore){
           document.getElementById("hits").innerHTML = this.score;
-          document.getElementById("end").innerHTML = "You Lost";
+          document.getElementById("end").innerHTML = "Game Over";
+          this.highScore = this.score;
+        }
+        else {
+          document.getElementById("end").innerHTML = "Game Over";
         }
         this.stopRender();
       }
@@ -262,7 +265,6 @@ export default class App {
     this.wallArray = [];
     this.stopRender();
     this.startRender();
-    this.stopRender();
   }
 
   moveLeft(){
